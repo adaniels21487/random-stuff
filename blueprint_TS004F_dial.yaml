@@ -45,8 +45,10 @@ max: 10
 max_exceeded: silent
 
 trigger:
-  - platform: event
-    event_type: zha_event
+  - platform: device
+    domain: zha
+    device_id: !input remote
+    type: left
 
 variables:
   device_id: "{{ trigger.event.data.device_id }}"
@@ -57,15 +59,7 @@ variables:
 
 condition:
   - condition: template
-    value_template: >
-      {{
-        trigger.event.data.command in [
-          'left',
-          'right',
-          'remote_button_short_press',
-          'remote_button_double_press'
-        ]
-      }}
+    value_template: "{{ device_id == remote_device }}"
 
 action:
   - choose:
