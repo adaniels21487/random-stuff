@@ -57,7 +57,15 @@ variables:
 
 condition:
   - condition: template
-    value_template: "{{ device_id == remote_device }}"
+    value_template: >
+      {{
+        trigger.event.data.command in [
+          'left',
+          'right',
+          'remote_button_short_press',
+          'remote_button_double_press'
+        ]
+      }}
 
 action:
   - choose:
