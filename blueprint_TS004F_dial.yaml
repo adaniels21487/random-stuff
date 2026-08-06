@@ -1,0 +1,104 @@
+blueprint:
+  name: ZHA TS004F Dial
+  description: >
+    Control a light using a Zigbee dial.
+    Single press toggles the light.
+    Double press runs a custom action.
+    Rotate adjusts brightness.
+
+  domain: automation
+
+  input:
+
+    remote:
+      name: Zigbee Dial
+      selector:
+        device:
+          integration: zha
+
+    light:
+      name: Light
+      selector:
+        entity:
+          domain: light
+
+    brightness_step:
+      name: Brightness Step %
+      description: Amount to change per click
+      default: 10
+      selector:
+        number:
+          min: 1
+          max: 50
+          step: 1
+          unit_of_measurement: "%"
+
+    double_press_action:
+      name: Double Press Action
+      description: Optional action to run on double press
+      default: []
+      selector:
+        action:
+
+mode: restart
+max_exceeded: silent
+
+trigger:
+  - platform: event
+    event_type: zha_event
+
+variables:
+  device_id: "{{ trigger.event.data.device_id }}"
+  command: "{{ trigger.event.data.command }}"
+  remote_device: !input remote
+  light_entity: !input light
+  step: !input brightness_step
+
+condition:
+  - condition: template
+    value_template: "{{ device_id == remote_device }}"
+
+action:
+  - choose:
+
+      # Single Press
+      - conditions:
+          - condition: template
+            value_template: >
+              {{ command == 'remote_button_short_press' }}
+        sequence:
+          - service: light.toggle
+            target:
+              entity_id: !input light
+
+      # Double Press
+      - conditions:
+          - condition: template
+            value_template: >
+              {{ command == 'remote_button_double_press' }}
+        sequence: !input double_press_action
+
+      # Rotate Right
+      - conditions:
+          - condition: template
+            value_template: >
+              {{ command == 'right' }}
+        sequence:
+          - service: light.turn_on
+            target:
+              entity_id: !input light
+            data:
+              brightness_step_pct: !input brightness_step
+
+      # Rotate Left
+      - conditions:
+          - condition: template
+            value_template: >
+              {{ command == 'left' }}
+        sequence:
+          - service: light.turn_on
+            target:
+              entity_id: !input light
+            data:
+              brightness_step_pct: >
+                {{ 0 - step }}
