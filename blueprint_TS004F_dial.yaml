@@ -26,9 +26,8 @@ blueprint:
     light:
       name: Light(s)
       selector:
-        target:
-          entity:
-            domain: light
+        entity:
+          domain: light
 
     brightness_step:
       name: Brightness Step %
@@ -72,7 +71,8 @@ action:
               {{ command == 'remote_button_short_press' }}
         sequence:
           - service: light.toggle
-            target: !input light
+            target:
+              entity_id: !input light
 
       # Double Press
       - conditions:
@@ -88,7 +88,8 @@ action:
               {{ command == 'right' }}
         sequence:
           - service: light.turn_on
-            target: !input light
+            target:
+              entity_id: !input light
             data:
               brightness_step_pct: !input brightness_step
 
@@ -99,7 +100,8 @@ action:
               {{ command == 'left' }}
         sequence:
           - service: light.turn_on
-            target: !input light
+            target:
+              entity_id: !input light
             data:
               brightness_step_pct: >
                 {{ step * -1 }}
