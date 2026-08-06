@@ -15,6 +15,7 @@ blueprint:
       selector:
         device:
           integration: zha
+          model: TS004F
 
     light:
       name: Light
