@@ -45,10 +45,8 @@ max: 10
 max_exceeded: silent
 
 trigger:
-  - platform: device
-    domain: zha
-    device_id: !input remote
-    type: left
+  - platform: event
+    event_type: zha_event
 
 variables:
   device_id: "{{ trigger.event.data.device_id }}"
